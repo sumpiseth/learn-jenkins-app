@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        NETLIFY_SITE_ID = '71a7ec1b-adc1-443e-81a5-8a4c9c4fa9a2'
+        NETLIFY_SITE_ID = '71a7ec1b-adc1-443e-81a5-8a4c9c4fa9a2'\
+
     }
 
     stages {
@@ -32,6 +33,7 @@ pipeline {
                     agent {
                         docker {
                             image 'node:18-alpine'
+                            args '-e NODE_ENV=test -e CI=true'
                             reuseNode true
                         }
                     }
@@ -39,12 +41,13 @@ pipeline {
                     steps {
                         sh '''
                             test -f build/index.html
-                            npm test
+                            npm test -- --coverage
                         '''
                     }
                     post {
                         always {
                             junit 'jest-results/junit.xml'
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true, reportDir: 'coverage', reportFiles: 'index.html', reportName: 'Coverage Report', reportTitles: '', useWrapperFileDirectly: true])
                         }
                     }
                 }
@@ -82,11 +85,13 @@ pipeline {
                     reuseNode true
                 }
             }
+            environment {
+                NETLIFY_AUTH_TOKEN = credentials('netlify-auth-token')
+            }
             steps {
                 sh '''
                     npm install netlify-cli
-                    node_modules/.bin/netlify --version
-                    echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
+                    node_modules/.bin/netlify deploy --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN --prod --dir=build
                 '''
             }
         }
