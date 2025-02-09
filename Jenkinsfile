@@ -27,6 +27,27 @@ pipeline {
             }
         }
 
+        stage('Test') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    CI=true npm run test
+                '''
+            }
+            post {
+                always {
+                    junit 'junit.xml'
+                }
+            }
+        }
+
+
+
         stage('Deploy') {
             agent {
                 docker {
