@@ -35,19 +35,13 @@ pipeline {
                 }
             }
             steps {
-                script {
-                    try {
-                        sh 'CI=true npm run test -- --coverage --testResultsProcessor="jest-junit"'
-                        currentBuild.result = 'SUCCESS'
-                    } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
-                        error("Tests failed: ${e.message}")
-                    }
-                }
+                sh '''
+                    CI=true npm run test
+                '''
             }
             post {
                 always {
-                    junit allowEmptyResults: true, testResults: 'coverage/junit.xml'
+                    junit allowEmptyResults: true, testResults: 'junit.xml'
                 }
             }
         }
