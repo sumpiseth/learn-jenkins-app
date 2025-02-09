@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     environment {
-        NETLIFY_SITE_ID = '71a7ec1b-adc1-443e-81a5-8a4c9c4fa9a2'\
+        NETLIFY_SITE_ID = '71a7ec1b-adc1-443e-81a5-8a4c9c4fa9a2'
+        NETLIFY_AUTH_TOKEN = credentials('netlify-auth-token')
 
     }
 
@@ -85,9 +86,9 @@ pipeline {
                     reuseNode true
                 }
             }
-            environment {
-                NETLIFY_AUTH_TOKEN = credentials('netlify-auth-token')
-            }
+            // environment {
+            //     NETLIFY_AUTH_TOKEN = credentials('netlify-auth-token')
+            // }
             steps {
                 sh '''
                     npm install netlify-cli
